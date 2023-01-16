@@ -1,8 +1,7 @@
 import requests
 from ProxyHandler import request_get
 from typing import Union
-from itertools import cycle
-import time
+from urllib.parse import quote
 
 USERS_ENDPOINT="https://users.roblox.com"
 API_ENDPOINT="https://api.roblox.com"
@@ -22,13 +21,6 @@ class RobloxUser:
     @staticmethod
     def get_user_id(user_name: str) -> int:
         response: requests.Response = request_get(f"{API_ENDPOINT}/users/get-by-username?username={user_name}")
-        # response.raise_for_status()
-        # print(get_proxy())
-        if response.status_code == 429:
-            time.sleep(2)
-            print(f"Retrying: {time.time()}")
-            return RobloxUser.get_user_id(user_name)
-
         response_json: dict = response.json()
         try:
             return response_json["Id"]
@@ -40,7 +32,6 @@ class RobloxUser:
         total_place_visits: int = 0;
         response = request_get(f"{GAMES_ENDPOINT}/v2/users/{self.user_id}/games?limit=50")
         response_json: dict = response.json()
-
         for game in response_json["data"]:
             total_place_visits += game["placeVisits"]
         return total_place_visits
@@ -54,3 +45,33 @@ class RobloxUser:
             raise Exception(response_json["errorMessage"])
 
 
+class RobloxGroup:
+    def __init__(self, group: Union[int, str]):
+        if type(group) == str: # Group name was specified
+            self.group_data =  RobloxGroup.get_group_data(group);
+
+    @staticmethod
+    def get_group_data(group_name: str) -> int:
+        response: requests.Response = request_get(f"https://groups.roblox.com/v1/groups/search/lookup?groupName={quote(group_name)}")
+        response_json: dict = response.json()
+        try:
+            return response_json["data"][0]
+        except IndexError:
+            print(f"Group: {group_name} not found");
+            return None;
+        except Exception as err:
+            print(f"Unexpected {err=}, {type(err)=}")
+            raise
+
+
+    def get_group_members(self) -> int:
+        if self.group_data is None: return 0;
+        return self.group_data["memberCount"]
+
+    def __str__(self) -> str:
+        if self.group_data is None: return "";
+        return self.group_data["name"]
+
+    def __repr__(self) -> str:
+        if self.group_data is None: return "";
+        return f"{self.group_data['id']} : {self.group_data['name']}"

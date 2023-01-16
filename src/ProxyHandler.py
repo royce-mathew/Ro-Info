@@ -37,8 +37,13 @@ user_agent_list = [
     'Mozilla/4.0 (compatible; MSIE 8.0; Windows NT 5.1; Trident/4.0; .NET CLR 2.0.50727; .NET CLR 3.0.4506.2152; .NET CLR 3.5.30729)'
 ]
 
+def delete_last_line():
+    "Use this function to delete the last line in the STDOUT"
+    sys.stdout.write('\x1b[1A') # Move cursor up one line
+    sys.stdout.write('\x1b[2K') # Delete last line
+
 def initialize_proxies():
-    response = requests.get("https://raw.githubusercontent.com/TheSpeedX/PROXY-List/master/http.txt")
+    response = requests.get("https://raw.githubusercontent.com/saschazesiger/Free-Proxies/master/proxies/http.txt")
     response.raise_for_status() # Check if Proxies Work
     return response.text.splitlines();
 
@@ -53,7 +58,7 @@ def read_proxies():
 
 def check_proxy(proxy):
     try:
-        response = requests.get("http://ipinfo.io/json",
+        response = requests.get("https://ipecho.net/plain",
             proxies={"http": proxy,
             "https": proxy},
             timeout=timeout
@@ -64,9 +69,12 @@ def check_proxy(proxy):
 
 def check_proxies(proxies):
     for proxy in proxies:
-        print(f"Requesting {proxy}")
+        print(f"Checking {proxy}", end="\t\t")
         if check_proxy(proxy) == True:
+            print("✔️")
             valid_proxies.append(proxy)
+        else:
+            print("☠️")
 
 
 def clean_proxies(proxy_list):
@@ -92,9 +100,11 @@ def clean_proxies(proxy_list):
 def get_proxy():
     return valid_proxies[random.randint(0, len(valid_proxies))];
 
-def request_get(url: str):
+def internal_get(url: str):
     proxy = valid_proxies[0];
-    print(f"Trying: {url}; Proxy: {proxy}")
+
+    delete_last_line()
+    print(f"Request: {url}; Proxy: {proxy}")
     try:
         response = requests.get(
             url, 
@@ -107,7 +117,11 @@ def request_get(url: str):
     except:
         valid_proxies.pop(0);
         # Bad Proxy
-        return request_get(url)
+        return internal_get(url)
+
+def request_get(url: str):
+    print("Requesting ..")
+    return internal_get(url);
 
 if __name__ == "__main__":
     try:
@@ -119,7 +133,7 @@ if __name__ == "__main__":
             for proxy in valid_proxies:
                 file.write(f"{proxy}\n")
 
-        print("\n\nWrote to File")
+        print(f"\n\nWrote {len(valid_proxies)} Proxies")
         try:
             sys.exit(0)
         except SystemExit:
