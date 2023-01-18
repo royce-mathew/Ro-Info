@@ -24,8 +24,9 @@ class RobloxUser:
         response_json: dict = response.json()
         try:
             return response_json["Id"]
-        except:
-            raise Exception(response_json["errorMessage"])
+        except Exception as err:
+            print(f"User: {user_name} not found; {err}");
+            return None;
 
 
     def get_total_visits(self) -> int:
@@ -65,13 +66,22 @@ class RobloxGroup:
 
 
     def get_group_members(self) -> int:
-        if self.group_data is None: return 0;
-        return self.group_data["memberCount"]
+        try:
+            return self.group_data["memberCount"]
+        except Exception as err:
+            print(err)
+            return 0;
 
     def __str__(self) -> str:
-        if self.group_data is None: return "";
-        return self.group_data["name"]
+        try:
+            return self.group_data["name"]
+        except Exception as err:
+            print(err)
+            return ""
 
     def __repr__(self) -> str:
-        if self.group_data is None: return "";
-        return f"{self.group_data['id']} : {self.group_data['name']}"
+        try:
+            f"{self.group_data['id']} : {self.group_data['name']}"
+        except Exception as err:
+            print(err)
+            return ""

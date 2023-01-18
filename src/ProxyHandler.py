@@ -6,7 +6,7 @@ import os
 import random
 
 timeout=3
-thread_count = 10;
+thread_count = 50;
 valid_proxies = []
 
 user_agent_list = [
@@ -44,6 +44,8 @@ def delete_last_line():
 
 def initialize_proxies():
     response = requests.get("https://raw.githubusercontent.com/saschazesiger/Free-Proxies/master/proxies/http.txt")
+    # response = requests.get("https://raw.githubusercontent.com/MuRongPIG/Proxy-Master/main/http.txt")
+    # response = requests.get("https://raw.githubusercontent.com/parserpp/ip_ports/main/proxyinfo.txt")
     response.raise_for_status() # Check if Proxies Work
     return response.text.splitlines();
 
@@ -123,19 +125,31 @@ def request_get(url: str):
     print("Requesting ..")
     return internal_get(url);
 
+def program_exit():
+    try:
+        sys.exit(0)
+    except SystemExit:
+        os._exit(0)
+
 if __name__ == "__main__":
+    open_type: str = input("Would you like to append or overwrite? [a/o]: ")
+    if open_type not in ["a", "o"]:
+        print("Defaulting to Overwrite")
+        open_type = "o"
+    
+    # Try statement for catching keyboard interrupt
     try:
         # Initialize All Proxies
         proxy_list = initialize_proxies()
         clean_proxies(proxy_list)
     except KeyboardInterrupt:
-        with open("clean_proxies.txt", "w") as file:
-            for proxy in valid_proxies:
-                file.write(f"{proxy}\n")
+        pass;
+    
 
-        print(f"\n\nWrote {len(valid_proxies)} Proxies")
-        try:
-            sys.exit(0)
-        except SystemExit:
-            os._exit(0)
+    with open("clean_proxies.txt", "w" if (open_type == "o") else "a") as file:
+        for proxy in valid_proxies:
+            file.write(f"{proxy}\n")
+
+    print(f"\n\nWrote {len(valid_proxies)} Proxies")
+    program_exit()
     
