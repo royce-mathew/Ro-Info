@@ -112,7 +112,7 @@ class UserData:
     def write_file(self, file_name: str=DEFAULT_USER_INPUT):
         Util.write_file(self.json_data, file_name)
 
-    def compare_data(self):
+    def store_unchecked(self):
         current_list = self.json_data.keys()
         full_list = self.user_list;
         return [x for x in full_list if x not in current_list]
