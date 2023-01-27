@@ -103,6 +103,7 @@ def get_proxy():
     return valid_proxies[random.randint(0, len(valid_proxies))];
 
 def internal_get(url: str):
+    if len(valid_proxies) == 0: return;
     proxy = valid_proxies[0];
 
     delete_last_line()
@@ -117,7 +118,10 @@ def internal_get(url: str):
         response.raise_for_status()
         return response;
     except:
-        valid_proxies.pop(0);
+        try:
+            valid_proxies.pop(0);
+        except IndexError:
+            return;
         # Bad Proxy
         return internal_get(url)
 

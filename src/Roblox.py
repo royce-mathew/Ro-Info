@@ -21,6 +21,7 @@ class RobloxUser:
     @staticmethod
     def get_user_id(user_name: str) -> int:
         response: requests.Response = request_get(f"{API_ENDPOINT}/users/get-by-username?username={user_name}")
+        if response is None: return response;
         response_json: dict = response.json()
         try:
             return response_json["Id"]
@@ -32,6 +33,7 @@ class RobloxUser:
     def get_total_visits(self) -> int:
         total_place_visits: int = 0;
         response = request_get(f"{GAMES_ENDPOINT}/v2/users/{self.user_id}/games?limit=50")
+        if response is None: return response;
         response_json: dict = response.json()
         for game in response_json["data"]:
             total_place_visits += game["placeVisits"]
@@ -39,6 +41,8 @@ class RobloxUser:
 
     def get_followers(self) -> int:
         response: requests.Response = request_get(f"{FRIENDS_ENDPOINT}/v1/users/{self.user_id}/followers/count")
+        if response is None: return response;
+        
         response_json = response.json()
         try:
             return response_json["count"]
@@ -54,6 +58,8 @@ class RobloxGroup:
     @staticmethod
     def get_group_data(group_name: str) -> int:
         response: requests.Response = request_get(f"https://groups.roblox.com/v1/groups/search/lookup?groupName={quote(group_name)}")
+        if response is None: return response;
+        
         response_json: dict = response.json()
         try:
             return response_json["data"][0]

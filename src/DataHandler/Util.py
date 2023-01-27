@@ -28,10 +28,10 @@ def split_work(values: list, function: Callable, thread_count: int=25, *args):
     Save Data to a json file
 """
 def save_json(json_data: dict, file_name: str) -> None:
-        # Save Modified Data
-        with open(file_name, "w") as json_file:
-            json.dump(json_data, json_file, indent=4);
-            print(f"Wrote to {file_name}")
+    # Save Modified Data
+    with open(file_name, "w") as json_file:
+        json.dump(json_data, json_file, indent=4);
+        print(f"Wrote to {file_name}")
 
 """
     Save Data to a text file
@@ -41,6 +41,14 @@ def write_file(json_data: dict, file_name: str) -> None:
         for key in json_data.keys():
             file.write(f"{key}\n")
         print(f"Wrote to {file_name}")
+
+"""
+    save List to text file
+"""
+def write_list(main_list: list, file_name: str) -> None:
+    with open(file_name, "w") as file:
+        file.writelines(value + "\n" for value in main_list);
+
 
 """
     Read file and convert lines to a list

@@ -1,5 +1,6 @@
 from Roblox import RobloxGroup, RobloxUser
 from DataHandler import Util
+from datetime import datetime
 
 DEFAULT_GROUP_OUTPUT="data/group_output.json"
 DEFAULT_GROUP_INPUT="data/groups.txt"
@@ -20,10 +21,14 @@ class GroupData:
 
     @staticmethod
     def __group_main(group_list: list, json_data: dict):
+        current_time = datetime.now().ctime()
+
         for group_name in group_list:
             print(f"Group: {group_name}")
             group = RobloxGroup(group_name)
             total_members: int = group.get_group_members()
+            members_tuple = (current_time, total_members);
+
             group_full_name = group.__str__()
 
             if total_members == 0:
@@ -32,14 +37,14 @@ class GroupData:
 
             try:
                 # Append to json dict
-                json_data[group]["members"].append(total_members)            
+                json_data[group]["members"].append(members_tuple)            
             except:
                 # There are no previous entries
                 print(f"New Entry: {group_full_name}\n")
 
                 # Append data
                 json_data[group_full_name] = {
-                    "members": [total_members],
+                    "members": [members_tuple],
                 }
 
     def get_data(self) -> dict:
@@ -61,6 +66,7 @@ class UserData:
 
     @staticmethod
     def __user_main(user_list: list, json_data: dict):
+        current_time = datetime.now().ctime()
         # Read user list
         for username in user_list:
             print(f"Username: {username}")
@@ -68,19 +74,24 @@ class UserData:
             
             # Skip to next iteration
             if user.user_id is None:
+                user_list.remove(username)
                 continue;
 
             total_visits: int = user.get_total_visits()
             total_followers: int = user.get_followers()
+
+            visit_tuple = (current_time, total_visits);
+            followers_tuple = (current_time, total_visits);
             
             if total_visits == 0 or total_followers == 0:
                 print(f"Skipped: {username}; visits: {total_visits}; followers: {total_followers}")
+                user_list.remove(username)
                 continue;
 
             try:
                 # Append to json dict
-                json_data[username]["place_visits"].append(total_visits)
-                json_data[username]["followers"].append(total_followers)
+                json_data[username]["place_visits"].append(visit_tuple)
+                json_data[username]["followers"].append(followers_tuple)
             
             except:
                 # There are no previous entries
@@ -88,8 +99,8 @@ class UserData:
 
                 # Append data
                 json_data[username] = {
-                    "place_visits": [total_visits],
-                    "followers": [total_followers]
+                    "place_visits": [visit_tuple],
+                    "followers": [followers_tuple]
                 }
 
     def get_data(self) -> dict:
@@ -100,3 +111,8 @@ class UserData:
 
     def write_file(self, file_name: str=DEFAULT_USER_INPUT):
         Util.write_file(self.json_data, file_name)
+
+    def compare_data(self):
+        current_list = self.json_data.keys()
+        full_list = self.user_list;
+        return [x for x in full_list if x not in current_list]
