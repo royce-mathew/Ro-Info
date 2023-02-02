@@ -4,14 +4,16 @@ import DataHandler.Util as util;
 import Compare;
 
 def main() -> None:
-    # Read Proxies from Local
+    # Read Proxies from Localunchecked_users
     ProxyHandler.read_proxies()
-    main_data = UserData("data/users.txt")
-    main_data.save_data() # Save the Data / Write to output json
+    main_data = UserData("data/unchecked_users.txt")
+    # main_data.save_data() # Save the Data / Write to output json
+    main_data.save_csv() # Append New Data
 
-    user_json = main_data.get_data() # get user_data
-    chart_points = Compare.get_comparisons(user_json); # Calculate the chart points
-    util.save_json(chart_points, "data/comparisons.json"); # Save the comparisons in a json file
+    # user_json = main_data.get_data() # get user_data
+    # chart_points = Compare.get_comparisons(user_json, 0); # Calculate the chart points
+    # # util.save_json(chart_points, "data/comparisons.json"); # Save the comparisons in a json file
+    # util.write_csv(chart_points, "data/comparisons.csv"); # Save comparisons in a csv file
 
     # Store unchecked users
     unchecked = main_data.store_unchecked()

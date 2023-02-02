@@ -5,6 +5,7 @@ from datetime import datetime
 DEFAULT_GROUP_OUTPUT="data/group_output.json"
 DEFAULT_GROUP_INPUT="data/groups.txt"
 DEFAULT_USER_OUTPUT="data/user_output.json"
+DEFAULT_USER_OUTPUT_CSV="data/user_output.csv"
 DEFAULT_USER_INPUT="data/users.txt"
 
 
@@ -21,7 +22,7 @@ class GroupData:
 
     @staticmethod
     def __group_main(group_list: list, json_data: dict):
-        current_time = datetime.now().ctime()
+        current_time = datetime.today().strftime('%Y-%m-%d')
 
         for group_name in group_list:
             print(f"Group: {group_name}")
@@ -66,7 +67,7 @@ class UserData:
 
     @staticmethod
     def __user_main(user_list: list, json_data: dict):
-        current_time = datetime.now().ctime()
+        current_time = datetime.today().strftime('%Y-%m-%d')
         # Read user list
         for username in user_list:
             print(f"Username: {username}")
@@ -74,6 +75,7 @@ class UserData:
             
             # Skip to next iteration
             if user.user_id is None:
+                print(f"Skipped: {username};")
                 user_list.remove(username)
                 continue;
 
@@ -81,7 +83,7 @@ class UserData:
             total_followers: int = user.get_followers()
 
             visit_tuple = (current_time, total_visits);
-            followers_tuple = (current_time, total_visits);
+            followers_tuple = (current_time, total_followers);
             
             if total_visits == 0 or total_followers == 0:
                 print(f"Skipped: {username}; visits: {total_visits}; followers: {total_followers}")
@@ -108,6 +110,9 @@ class UserData:
 
     def save_data(self, file_name: str=DEFAULT_USER_OUTPUT):
         Util.save_json(self.json_data, file_name)
+
+    def save_csv(self, file_name: str=DEFAULT_USER_OUTPUT_CSV):
+        Util.save_csv(self.json_data, file_name)
 
     def write_file(self, file_name: str=DEFAULT_USER_INPUT):
         Util.write_file(self.json_data, file_name)

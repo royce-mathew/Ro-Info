@@ -1,7 +1,9 @@
+import csv
 import json
 import math
 from typing import Callable
 import threading
+
 
 """
     Splits work for worker threads
@@ -32,6 +34,23 @@ def save_json(json_data: dict, file_name: str) -> None:
     with open(file_name, "w") as json_file:
         json.dump(json_data, json_file, indent=4);
         print(f"Wrote to {file_name}")
+
+def save_csv(json_data: dict, file_name: str) -> None:
+    with open(file_name, "a") as csv_file:
+        writer = csv.writer(csv_file)
+        for key, value in json_data.items(): # Loops through each user
+            followers = value["followers"][-1][1]
+            visits = value["place_visits"][-1][1]
+
+            # Get Followers, Place Visits
+            writer.writerow([key, followers, visits])
+
+
+def write_csv(json_data: dict, file_name: str) -> None:
+    with open(file_name, "w") as csv_file:
+        writer = csv.writer(csv_file)
+        for key, value in json_data.items():
+            writer.writerow([key, *value])
 
 """
     Save Data to a text file
